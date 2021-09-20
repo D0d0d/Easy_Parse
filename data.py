@@ -12,7 +12,7 @@ from dhooks import Webhook, File
 class Data:
     scraper = cloudscraper.create_scraper()
     newsData = []
-    delay = {'bot': 4,
+    delay = {'bot': 3,
              'top': 6, }
     newsOldData = []
     data = []
@@ -30,34 +30,27 @@ class Data:
         'referer': 'https://brandshop.ru/new/',
         'accept-language': 'ru,de-DE;q=0.9,de;q=0.8,en-US;q=0.7,en;q=0.6', }
 
-    def saveData(self):
+    def save(self):
+        self.oldData = self.data
         with open("OldData.pkl", "wb") as a_file:
             pickle.dump(self.data, a_file)
 
     #        a_file = open("newsOldData.pkl", "wb")
     #        pickle.dump(self.newsData, a_file)
 
-    def loadData(self):
+    def load(self):
         with open("OldData.pkl", "rb") as a_file:
             self.oldData = pickle.load(a_file)
 
     #        a_file = open("newsOldData.pkl", "rb")
     #        self.newsOldData = pickle.load(a_file)
 
-    def getData(self, keys, proxies, save_page=False, l_hook = ''):
+    def refresh(self, keys, proxies, save_page=False):
         self.randDelay()
         resp = self.scraper.get(
             'https://brandshop.ru/new/?limit=240&mfp=31-kategoriya%5BКроссовки%5D,manufacturers%5B11,308,47,811%5D',
             proxies=proxies)
         page_n = html.fromstring(resp.text)
-        if save_page:
-            with open("page.html", "w", encoding='utf-8') as html_f:
-                html_f.write(resp.text)
-                if l_hook:
-                    hook = Webhook(l_hook)
-                    file = File(html_f,name='page.html')
-                    hook.send('Your page:',file=file)
-
 
         for product in page_n.xpath('//div[contains(@class,"product-container")]'):
             item = {}
@@ -88,6 +81,10 @@ class Data:
                     item['sizes'] = ['-']
                 self.data.append(item)
             print(item, '\n\n\n')
+        if save_page:
+            with open("page.html", "w", encoding='utf-8') as html_f:
+                html_f.write(resp.text)
+                return html_f.name
 
     def getSizes(self, item, proxies):
         link = 'https://brandshop.ru/getproductsize/' + re.search('/goods/(.+?)/', item['link']).group(1) + '/'
@@ -101,7 +98,7 @@ class Data:
     def getDif(self):
         dif = []
         for nD in self.data:
-            if not (any(nD['name'] == o_D['name'] for o_D in self.oldData)):
+            if (not(any(nD['name'] == o_D['name'] for o_D in self.oldData)))or(not(self.oldData)):
                 dif.append(nD)
                 print("you've entered 1 state")
             else:
