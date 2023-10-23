@@ -24,7 +24,7 @@ tData.saveData()'''
 proxies = [{'http':"http://175.44.109.216:9999"},{'http':"http://180.250.12.10:80"},{'http':"http://36.248.133.187:9999"},{'http':"188.166.83.17:8080"}]
 dif =[]
 tData = Data()
-mDisc = Discord('https://discord.com/api/webhooks/866779492856889435/LsxwFU-3elBn6oiNCPIlcZ_e5bTKQly3BNzypZpjZPAo8Y9r1DQ6kVVAXstZJL6W27ue')
+mDisc = Discord('....')
 mDisc.name ='The Brandshop Monitor'
 mDisc.icon ='https://i.ibb.co/h9tWQWx/ava.png'
 mDisc.links = "[Login](https://brandshop.ru/login/) \n [Checkout](https://brandshop.ru/checkout/)"
